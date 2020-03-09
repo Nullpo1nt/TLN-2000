@@ -1,13 +1,19 @@
 #include "greatCircle.h"
 
-namespace greatcircle
-{
+#include <math.h>
+#include <stdio.h>
 
-double spherical_distance(const LLPoint *p1, const LLPoint *p2)
-{
+const double mToNM = 0.000539957;
+
+// WGS84
+const double SEMI_MAJOR_AXIS = 6378137.0;       // m, a = semi-major axis
+const double SEMI_MINOR_AXIS = 6356752.314245;  // m, b = semi-minor axis
+const double F = 1 / 298.257223563;
+
+double spherical_distance(const LLPoint *p1, const LLPoint *p2) {
     const double phi1 = 0.5 * M_PI - p1->lat;
     const double phi2 = 0.5 * M_PI - p2->lat;
-    const double r = 0.5 * (6378137 + 6356752); // mean radius in meters
+    const double r = 0.5 * (6378137 + 6356752);  // mean radius in meters
     const double t = sin(phi1) * sin(phi2) * cos(p1->lon - p2->lon) + cos(phi1) * cos(phi2);
     return r * acos(t);
 }
@@ -16,92 +22,69 @@ double spherical_distance(const LLPoint *p1, const LLPoint *p2)
  * Vincenty’s Inverse Formula
  * FAA Order 8260.54A, Appendix 2
  */
-double llrad_to_meteres(const LLPoint *p1, const LLPoint *p2, const double tolerance /* = tolerance_cm */)
-{
+double llrad_to_meteres(const LLPoint *p1, const LLPoint *p2, const double tolerance /* = tolerance_cm */) {
     // Values needed outside the iterative portion
     double cos2Alpha, cos_2sigmam, lamda0, sigma;
 
     // reduced latitude, defined by tan U = (1 - f) tan phi
-    const double U1 = atan((1.0 - f) * tan(p1->lat));
-    const double U2 = atan((1.0 - f) * tan(p2->lat));
+    const double U1 = atan((1.0 - F) * tan(p1->lat));
+    const double U2 = atan((1.0 - F) * tan(p2->lat));
 
     const double L = p2->lon - p1->lon;
 
     // Line 13, First approximation of lamda
     double lamda = L;
 
-    do
-    {
+    do {
         // sqrt of Line 14
         const double sinSigma =
-            sqrt(
-                pow(cos(U2) * sin(lamda), 2.0) +
-                pow((cos(U1) * sin(U2)) - (sin(U1) * cos(U2) * cos(lamda)), 2.0));
+            sqrt(pow(cos(U2) * sin(lamda), 2.0) + pow((cos(U1) * sin(U2)) - (sin(U1) * cos(U2) * cos(lamda)), 2.0));
 
         // Line 15
-        const double cosSigma =
-            (sin(U1) * sin(U2)) + (cos(U1) * cos(U2) * cos(lamda));
+        const double cosSigma = (sin(U1) * sin(U2)) + (cos(U1) * cos(U2) * cos(lamda));
 
         // Line 16
         sigma = atan2(sinSigma, cosSigma);
 
         // Line 17
-        const double sinAlpha =
-            (cos(U1) * cos(U2) * sin(lamda)) / sin(sigma);
+        const double sinAlpha = (cos(U1) * cos(U2) * sin(lamda)) / sin(sigma);
 
         // Line 18
         cos2Alpha = 1.0 - (sinAlpha * sinAlpha);
-        cos_2sigmam =
-            cos(sigma) - ((2.0 * sin(U1) * sin(U2)) / cos2Alpha);
+        cos_2sigmam = cos(sigma) - ((2.0 * sin(U1) * sin(U2)) / cos2Alpha);
 
         // Line 10
-        const double C =
-            (f / 16.0) *
-            cos2Alpha *
-            (4.0 + (f * (4.0 - (3.0 * cos2Alpha))));
+        const double C = (F / 16.0) * cos2Alpha * (4.0 + (F * (4.0 - (3.0 * cos2Alpha))));
 
-        lamda0 = lamda; // Store lamda
+        lamda0 = lamda;  // Store lamda
 
         // Line 11
-        const double square =
-            cos_2sigmam + (C * cosSigma *
-                           (-1.0 + (2.0 * pow(cos_2sigmam, 2))));
+        const double square = cos_2sigmam + (C * cosSigma * (-1.0 + (2.0 * pow(cos_2sigmam, 2))));
         const double bracket = sigma + (C * sinSigma * square);
-        lamda = L + (1.0 - C) * f * sinAlpha * bracket;
+        lamda = L + (1.0 - C) * F * sinAlpha * bracket;
     } while (fabs(lamda0 - lamda) > tolerance);
 
-    const double u2 = cos2Alpha * (((a - b) * (a + b)) / (b * b));
+    const double u2 = cos2Alpha * (((SEMI_MAJOR_AXIS - SEMI_MINOR_AXIS) * (SEMI_MAJOR_AXIS + SEMI_MINOR_AXIS)) /
+                                   (SEMI_MINOR_AXIS * SEMI_MINOR_AXIS));
 
     // Line 3
-    const double A =
-        1.0 + (u2 / 16384.0) *
-                  (4096.0 + (u2 *
-                             (-768.0 + (u2 *
-                                        (320.0 - (175.0 * u2))))));
+    const double A = 1.0 + (u2 / 16384.0) * (4096.0 + (u2 * (-768.0 + (u2 * (320.0 - (175.0 * u2))))));
 
     // Line 4
-    const double B =
-        (u2 / 1024.0) *
-        (256.0 + (u2 *
-                  (-128.0 + (u2 *
-                             (74.0 - (47.0 * u2))))));
+    const double B = (u2 / 1024.0) * (256.0 + (u2 * (-128.0 + (u2 * (74.0 - (47.0 * u2))))));
 
     // Line 6
     const double deltaSigma =
         B * sin(sigma) *
         (cos_2sigmam +
          ((B / 4.0) * (cos(sigma) * ((2.0 * pow(cos_2sigmam, 2.0)) - 1.0)) -
-          ((B / 6.0) * (cos_2sigmam *
-                        ((4.0 * pow(sin(sigma), 2.0) - 3.0)) *
-                        ((4.0 * pow(cos_2sigmam, 2.0) - 3.0))))));
+          ((B / 6.0) * (cos_2sigmam * ((4.0 * pow(sin(sigma), 2.0) - 3.0)) * ((4.0 * pow(cos_2sigmam, 2.0) - 3.0))))));
 
     // Line 19
-    const double s = b * A * (sigma - deltaSigma);
+    const double s = SEMI_MINOR_AXIS * A * (sigma - deltaSigma);
 
     return s;
 }
-
-} // namespace greatcircle
 
 // int main(int argc, const char *argv[])
 // {

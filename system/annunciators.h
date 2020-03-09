@@ -1,15 +1,7 @@
 #ifndef _ANNUNCIATORS_H_
 #define _ANNUNCIATORS_H_
 
-namespace tln::annunciators
-{
-
-typedef enum : int
-{
-    TLN_ANNUNCIATOR_OFF = 0,
-    TLN_ANNUNCIATOR_ON = 1,
-    TLN_ANNUNCIATOR_BLINK = 2
-} TLN_ANNUNCIATOR;
+typedef enum { TLN_ANNUNCIATOR_OFF = 0, TLN_ANNUNCIATOR_ON = 1, TLN_ANNUNCIATOR_BLINK = 2 } TLN_ANNUNCIATOR;
 
 TLN_ANNUNCIATOR getAnnunciatorGps();
 TLN_ANNUNCIATOR getAnnunciatorWrn();
@@ -37,7 +29,5 @@ void setFplMode();
 void setCalcMode();
 void setAuxMode();
 void setAptVorMode();
-
-} // namespace tln::annunciators
 
 #endif

@@ -1,23 +1,16 @@
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
 
-#include <string.h>
+void displaySet(const char *top, const char *bot);
 
-namespace tln::display
-{
+char *displayGetTop();
+char *displayGetBot();
 
-void set(char *top, char *bot);
-
-char *getTop();
-char *getBot();
-
-void setTop(const char *s);
-void setBot(const char *s);
+void displaySetTop(const char *s);
+void displaySetBot(const char *s);
 
 // void write(int x, int maxLen,)
 
-void clear();
-
-} // namespace tln::display
+void displayClear();
 
 #endif

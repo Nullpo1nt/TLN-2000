@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.1.0)
 
-# specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# specify the C standard
 set(CMAKE_C_STANDARD 11)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CURSES_NEED_NCURSES True)
 
-file(GLOB SYSTEM_SOURCES system/*.cpp)
+file(GLOB SYSTEM_SOURCES system/*.c)
 add_library(system STATIC ${SYSTEM_SOURCES})
+target_link_libraries(system m)
 # target_compile_features(system PRIVATE cxx_constexpr)
 
 project(tnl2000 VERSION 0.1.0)
-add_executable(tnl2000 main.cpp)
+add_executable(tnl2000 main.c)
 
 find_package(Curses REQUIRED)
 find_package(Threads REQUIRED)
