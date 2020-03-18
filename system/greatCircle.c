@@ -3,34 +3,32 @@
 #include <math.h>
 #include <stdio.h>
 
-const double mToNM = 0.000539957;
+#define DEG_TO_RAD(x) (x * 0.017453293)   // degree to radian
+#define RAD_TO_DEG(x) (x * 57.295779513)  // degree to radian
+#define BEARING_TO_HEADING(x) fmod(x + (2.0f * M_PI), 2.0f * M_PI)
 
 // WGS84
 const double SEMI_MAJOR_AXIS = 6378137.0;       // m, a = semi-major axis
 const double SEMI_MINOR_AXIS = 6356752.314245;  // m, b = semi-minor axis
 const double F = 1 / 298.257223563;
 
-double spherical_distance(const LLPoint *p1, const LLPoint *p2) {
-    const double phi1 = 0.5 * M_PI - p1->lat;
-    const double phi2 = 0.5 * M_PI - p2->lat;
-    const double r = 0.5 * (6378137 + 6356752);  // mean radius in meters
-    const double t = sin(phi1) * sin(phi2) * cos(p1->lon - p2->lon) + cos(phi1) * cos(phi2);
-    return r * acos(t);
-}
+void gc_distance_bearing(gc_solution_t *solution, const gc_llp_t *p1, const gc_llp_t *p2, const double tolerance) {
+    const double p1lat = DEG_TO_RAD(p1->lat);
+    const double p2lat = DEG_TO_RAD(p2->lat);
+    const double p1lon = DEG_TO_RAD(p1->lon);
+    const double p2lon = DEG_TO_RAD(p2->lon);
 
-/**
- * Vincenty’s Inverse Formula
- * FAA Order 8260.54A, Appendix 2
- */
-double llrad_to_meteres(const LLPoint *p1, const LLPoint *p2, const double tolerance /* = tolerance_cm */) {
-    // Values needed outside the iterative portion
-    double cos2Alpha, cos_2sigmam, lamda0, sigma;
+    // Vincenty’s Inverse Formula
+    // FAA Order 8260.54A, Appendix 2
 
     // reduced latitude, defined by tan U = (1 - f) tan phi
-    const double U1 = atan((1.0 - F) * tan(p1->lat));
-    const double U2 = atan((1.0 - F) * tan(p2->lat));
+    const double U1 = atan((1.0 - F) * tan(p1lat));
+    const double U2 = atan((1.0 - F) * tan(p2lat));
 
-    const double L = p2->lon - p1->lon;
+    const double L = p2lon - p1lon;
+
+    // Values needed outside the iterative portion
+    double cos2Alpha, cos_2sigmam, lamda0, sigma;
 
     // Line 13, First approximation of lamda
     double lamda = L;
@@ -80,10 +78,34 @@ double llrad_to_meteres(const LLPoint *p1, const LLPoint *p2, const double toler
          ((B / 4.0) * (cos(sigma) * ((2.0 * pow(cos_2sigmam, 2.0)) - 1.0)) -
           ((B / 6.0) * (cos_2sigmam * ((4.0 * pow(sin(sigma), 2.0) - 3.0)) * ((4.0 * pow(cos_2sigmam, 2.0) - 3.0))))));
 
-    // Line 19
-    const double s = SEMI_MINOR_AXIS * A * (sigma - deltaSigma);
+    // Line 19 (meters)
+    solution->distance = SEMI_MINOR_AXIS * A * (sigma - deltaSigma);
 
-    return s;
+    // Line 20 (radians (+-180))
+    solution->bearing = atan2(cos(U2) * sin(lamda), cos(U1) * sin(U2) - sin(U1) * cos(U2) * cos(lamda));
+
+    // Line 21
+    // const double azRev = atan2(cos(U1) * sin(lamda), -sin(U1) * cos(U2) + cos(U1) * sin(U2) * cos(lamda));
+}
+
+void gc_llpoint(gc_llp_t *start, gc_solution_t *disBearing) {}
+
+double gc_distance_nm(const gc_solution_t *solution) {
+    double distance = M_TO_NM(solution->distance);
+    return distance;
+}
+
+double gc_bearing_deg(const gc_solution_t *solution) {
+    double bearing = RAD_TO_DEG(BEARING_TO_HEADING(solution->bearing));
+    return bearing;
+}
+
+double spherical_distance(const gc_llp_t *p1, const gc_llp_t *p2) {
+    const double phi1 = 0.5 * M_PI - p1->lat;
+    const double phi2 = 0.5 * M_PI - p2->lat;
+    const double r = 0.5 * (6378137 + 6356752);  // mean radius in meters
+    const double t = sin(phi1) * sin(phi2) * cos(p1->lon - p2->lon) + cos(phi1) * cos(phi2);
+    return r * acos(t);
 }
 
 // int main(int argc, const char *argv[])

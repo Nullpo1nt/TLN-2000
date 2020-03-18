@@ -1,5 +1,5 @@
-#ifndef _APTVOR_H_
-#define _APTVOR_H_
+#ifndef _TLN2000AP_APTVOR_H_
+#define _TLN2000AP_APTVOR_H_
 
 void aptVorCategory();
 void aptVorCategoryNext();

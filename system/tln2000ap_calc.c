@@ -1,4 +1,4 @@
-#include "calc.h"
+#include "tln2000ap_calc.h"
 
 #include "annunciators.h"
 #include "display.h"
@@ -97,4 +97,6 @@ void calcPrevSub() {
     renderCalc();
 }
 
-void calcSavePPos() { displaySet("PRESENT POSITION", "SAVED IN alpha"); }
+void calcSavePPos() {
+    displaySet("PRESENT POSITION", "SAVED IN alpha");
+}

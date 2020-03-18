@@ -1,11 +1,17 @@
-#ifndef _TLN2000_H_
-#define _TLN2000_H_
+#ifndef _TLN2000AP_H_
+#define _TLN2000AP_H_
+
+#include <stdlib.h>
 
 #include "greatCircle.h"
-#include "structs.h"
+#include "state.h"
+#include "tln_structs.h"
 
-typedef enum {
-    TLN_STATE_OFF = 0,
+extern tln_sm_transition_t states[];
+extern tln_sm_t tln2000sm;
+
+enum {
+    TLN_STATE_OFF = TLN_USER_STATES_START,
     TLN_STATE_SELF_TEST,
     TLN_STATE_FUEL_ON_BOARD_PROMPT,
     TLN_STATE_FUEL_ON_BOARD_EDIT,
@@ -18,6 +24,11 @@ typedef enum {
     // WPT
     TLN_STATE_WPT,
     TLN_STATE_WPT_CATEGORY,
+    TLN_STATE_WPT_AIRPORT,
+    TLN_STATE_WPT_VOR,
+    TLN_STATE_WPT_NDB,
+    TLN_STATE_WPT_INT,
+    TLN_STATE_WPT_USER,
 
     // CALC
     TLN_STATE_CALC,
@@ -25,6 +36,10 @@ typedef enum {
     TLN_STATE_CALC_PPOS_SAVE,
 
     TLN_STATE_AUX_CHECKLIST,
+    TLN_STATE_AUX_SYSTEM_STATUS,
+    TLN_STATE_AUX_SENSOR_STATUS,
+    TLN_STATE_AUX_CONFIGURE,
+    TLN_STATE_AUX_SETUP,
     TLN_STATE_AUX_STATUS,
     TLN_STATE_AUX_VOLTTEMP,
     TLN_STATE_AUX_DATABASE_EXP,
@@ -34,16 +49,13 @@ typedef enum {
     // APTVOR
     TLN_STATE_APTVOR,
     TLN_STATE_APTVOR_CATEGORY,
-
-    // Match any state
-    TLN_STATE_ANY
 } TLN_STATE;
 
-typedef enum {
+enum {
     // Generic update Event
-    TLN_EVENT_ANY = 0,
-    TLN_EVENT_UPDATE = 1,
-    TLN_EVENT_TIMEOUT = 2,
+    TLN_EVENT_UPDATE = TLN_USER_EVENTS_START,
+    TLN_EVENT_SYSTEM_UPDATE,
+    TLN_EVENT_TIMEOUT,
 
     // Self test event
     TLN_EVENT_TEST_PASS,
@@ -75,15 +87,6 @@ typedef enum {
     TLN_EVENT_BTN_ROT_IN_CC
 } TLN_EVENT;
 
-typedef struct TLN_STATE_TRANSISTION_S {
-    TLN_STATE currentState;
-    TLN_EVENT transistionEvent;
-    TLN_STATE nextState;
-    void (*stateFunction)(void);
-} TLN_STATE_TRANSISTION;
-
-void changeState(TLN_EVENT event);
-
-int getState();
+tln_sm_t init_tln2000();
 
 #endif  // _TLN2000_H_

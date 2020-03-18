@@ -36,23 +36,51 @@ struct ANNUNCIATOR_DATA_S {
                          .msg = TLN_ANNUNCIATOR_OFF,
                          .ent = TLN_ANNUNCIATOR_OFF};
 
-TLN_ANNUNCIATOR getAnnunciatorGps() { return g_annunciators_data.gps; }
-TLN_ANNUNCIATOR getAnnunciatorWrn() { return g_annunciators_data.wrn; }
-TLN_ANNUNCIATOR getAnnunciatorAdv() { return g_annunciators_data.adv; }
-TLN_ANNUNCIATOR getAnnunciatorPtk() { return g_annunciators_data.ptk; }
+TLN_ANNUNCIATOR getAnnunciatorGps() {
+    return g_annunciators_data.gps;
+}
+TLN_ANNUNCIATOR getAnnunciatorWrn() {
+    return g_annunciators_data.wrn;
+}
+TLN_ANNUNCIATOR getAnnunciatorAdv() {
+    return g_annunciators_data.adv;
+}
+TLN_ANNUNCIATOR getAnnunciatorPtk() {
+    return g_annunciators_data.ptk;
+}
 // TLN_ANNUNCIATOR getAnnunciatorApr() { return g_annunciators_data.; }
 
-TLN_ANNUNCIATOR getAnnunciatorNav() { return g_annunciators_data.nav; }
-TLN_ANNUNCIATOR getAnnunciatorWpt() { return g_annunciators_data.wpt; }
-TLN_ANNUNCIATOR getAnnunciatorFpl() { return g_annunciators_data.fpl; }
-TLN_ANNUNCIATOR getAnnunciatorCalc() { return g_annunciators_data.calc; }
-TLN_ANNUNCIATOR getAnnunciatorAux() { return g_annunciators_data.aux; }
-TLN_ANNUNCIATOR getAnnunciatorAptVor() { return g_annunciators_data.aptVor; }
-TLN_ANNUNCIATOR getAnnunciatorDirect() { return g_annunciators_data.direct; }
-TLN_ANNUNCIATOR getAnnunciatorMsg() { return g_annunciators_data.msg; }
-TLN_ANNUNCIATOR getAnnunciatorEnt() { return g_annunciators_data.ent; }
+TLN_ANNUNCIATOR getAnnunciatorNav() {
+    return g_annunciators_data.nav;
+}
+TLN_ANNUNCIATOR getAnnunciatorWpt() {
+    return g_annunciators_data.wpt;
+}
+TLN_ANNUNCIATOR getAnnunciatorFpl() {
+    return g_annunciators_data.fpl;
+}
+TLN_ANNUNCIATOR getAnnunciatorCalc() {
+    return g_annunciators_data.calc;
+}
+TLN_ANNUNCIATOR getAnnunciatorAux() {
+    return g_annunciators_data.aux;
+}
+TLN_ANNUNCIATOR getAnnunciatorAptVor() {
+    return g_annunciators_data.aptVor;
+}
+TLN_ANNUNCIATOR getAnnunciatorDirect() {
+    return g_annunciators_data.direct;
+}
+TLN_ANNUNCIATOR getAnnunciatorMsg() {
+    return g_annunciators_data.msg;
+}
+TLN_ANNUNCIATOR getAnnunciatorEnt() {
+    return g_annunciators_data.ent;
+}
 
-void setEnt(TLN_ANNUNCIATOR mode) { g_annunciators_data.ent = mode; }
+void setEnt(TLN_ANNUNCIATOR mode) {
+    g_annunciators_data.ent = mode;
+}
 
 void enableAllAnnunciators() {
     g_annunciators_data.gps = TLN_ANNUNCIATOR_ON;

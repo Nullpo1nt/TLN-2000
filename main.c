@@ -1,11 +1,13 @@
 #include <ncurses.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>  // sleep
 
 #include "system/annunciators.h"
 #include "system/display.h"
-#include "system/tln2000.h"
+#include "system/state.h"
+#include "system/tln2000ap.h"
 
 bool running = true;
 int i = 0;
@@ -24,14 +26,15 @@ void printscreen() {
            (getAnnunciatorWpt()) ? "*" : ".", (getAnnunciatorFpl()) ? "*" : ".", (getAnnunciatorCalc()) ? "*" : ".",
            (getAnnunciatorAux()) ? "*" : ".", (getAnnunciatorAptVor()) ? "*" : ".");
 
-    printw("state = %i, t = %i\n", getState(), i);
+    printw("state = %i, t = %i\n", state_current(tln2000sm), i);
 
     refresh();
 }
 
 void *tlnBackground(void *vargp) {
     while (running) {
-        changeState(TLN_EVENT_UPDATE);
+        state_update(tln2000sm, TLN_EVENT_SYSTEM_UPDATE);
+        state_update(tln2000sm, TLN_EVENT_UPDATE);
 
         printscreen();
 
@@ -42,6 +45,8 @@ void *tlnBackground(void *vargp) {
 }
 
 int main(int argc, const char *argv[]) {
+    tln2000sm = init_tln2000();
+
     initscr();
     cbreak();
     noecho();
@@ -57,58 +62,58 @@ int main(int argc, const char *argv[]) {
 
         switch (in) {
             case 'p':
-                changeState(TLN_EVENT_BTN_POWER);
+                state_update(tln2000sm, TLN_EVENT_BTN_POWER);
                 break;
             case 'n':
-                changeState(TLN_EVENT_BTN_NAV);
+                state_update(tln2000sm, TLN_EVENT_BTN_NAV);
                 break;
             case 'N':
-                changeState(TLN_EVENT_BTN_NAV_HOLD);
+                state_update(tln2000sm, TLN_EVENT_BTN_NAV_HOLD);
                 break;
             case 'w':
-                changeState(TLN_EVENT_BTN_WPT);
+                state_update(tln2000sm, TLN_EVENT_BTN_WPT);
                 break;
             case 'W':
-                changeState(TLN_EVENT_BTN_WPT_HOLD);
+                state_update(tln2000sm, TLN_EVENT_BTN_WPT_HOLD);
                 break;
             case 'f':
-                changeState(TLN_EVENT_BTN_FPL);
+                state_update(tln2000sm, TLN_EVENT_BTN_FPL);
                 break;
             case 'c':
-                changeState(TLN_EVENT_BTN_CALC);
+                state_update(tln2000sm, TLN_EVENT_BTN_CALC);
                 break;
             case 'a':
-                changeState(TLN_EVENT_BTN_AUX);
+                state_update(tln2000sm, TLN_EVENT_BTN_AUX);
                 break;
             case 'A':
-                changeState(TLN_EVENT_BTN_AUX_HOLD);
+                state_update(tln2000sm, TLN_EVENT_BTN_AUX_HOLD);
                 break;
             case 'v':
-                changeState(TLN_EVENT_BTN_APTVOR);
+                state_update(tln2000sm, TLN_EVENT_BTN_APTVOR);
                 break;
             case 'd':
-                changeState(TLN_EVENT_BTN_DIRECT);
+                state_update(tln2000sm, TLN_EVENT_BTN_DIRECT);
                 break;
             case 'm':
-                changeState(TLN_EVENT_BTN_MSG);
+                state_update(tln2000sm, TLN_EVENT_BTN_MSG);
                 break;
             case 'e':
-                changeState(TLN_EVENT_BTN_ENT);
+                state_update(tln2000sm, TLN_EVENT_BTN_ENT);
                 break;
             case '1':
-                changeState(TLN_EVENT_BTN_ROT_IN_CC);
+                state_update(tln2000sm, TLN_EVENT_BTN_ROT_IN_CC);
                 break;
             case '2':
-                changeState(TLN_EVENT_BTN_ROT_IN_CW);
+                state_update(tln2000sm, TLN_EVENT_BTN_ROT_IN_CW);
                 break;
             case '3':
-                changeState(TLN_EVENT_BTN_ROT_OUT_CC);
+                state_update(tln2000sm, TLN_EVENT_BTN_ROT_OUT_CC);
                 break;
             case '4':
-                changeState(TLN_EVENT_BTN_ROT_OUT_CW);
+                state_update(tln2000sm, TLN_EVENT_BTN_ROT_OUT_CW);
                 break;
             case 'u':
-                changeState(TLN_EVENT_UPDATE);
+                state_update(tln2000sm, TLN_EVENT_UPDATE);
                 break;
             case 'q':
                 running = false;
@@ -122,6 +127,8 @@ int main(int argc, const char *argv[]) {
 
     endwin();
     pthread_exit(NULL);
+
+    free(tln2000sm);
 
     return 0;
 }

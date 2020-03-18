@@ -37,9 +37,10 @@ typedef enum {
     LBL_DA,              // DA (over)
     LBL_KILO_FEET,       // KF (over)
     LBL_FEET_MINUTE,     // FM (over)
-    LBL_TRACK,           // TK
+    LBL_GROUND_TRACK,    // TK
+    LBL_DESIRED_TRACK,   // DT
     LBL_DIRECT_TRACK,    // DK
-    LBL_AT,              // AT
+    LBL_EXPECTED_ALT,    // AT
     LBL_TO,              // TO
     LBL_FROM,            // FM
     LBL_FROM_2,          // Fr
@@ -51,6 +52,7 @@ typedef enum {
     LBL_EAST,            // E
 
     WPT_AIRPORT,       // A (little)
+    WPT_AIRPORT_MIL,   // M (little)
     WPT_VOR,           // V (little)
     WPT_NDB,           // N (little)
     WPT_INTERSECTION,  // I (little)

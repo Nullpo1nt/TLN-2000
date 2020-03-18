@@ -1,7 +1,6 @@
-#ifndef _CALC_H_
-#define _CALC_H_
+#ifndef _TLN2000AP_CALC_H_
+#define _TLN2000AP_CALC_H_
 
-void renderCalc();
 void calc();
 void calcNext();
 void calcPrev();
