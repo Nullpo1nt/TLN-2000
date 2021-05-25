@@ -9,7 +9,7 @@
 #define TLN_EVENT_ANY 0
 #define TLN_USER_EVENTS_START 100
 
-typedef enum { CONSUME_EVENT = 0, BUBBLE_EVENT } tln_sm_bubbling_t;
+typedef enum { TLN_SM_CONSUME_EVENT = 0, TLN_SM_BUBBLE_EVENT } tln_sm_bubbling_t;
 
 typedef int tln_sm_state_t;
 typedef int tln_sm_event_t;

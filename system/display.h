@@ -9,7 +9,8 @@ char *displayGetBot();
 void displaySetTop(const char *s);
 void displaySetBot(const char *s);
 
-// void write(int x, int maxLen,)
+// void write(int x, int maxLen,
+// void display_sprintf(int y, char *format, ...);
 void display_write(int x, int y, const char *src, int len);
 void display_input(int x, int y, const char *src, int cursorPosition);
 

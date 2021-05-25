@@ -12,6 +12,7 @@ extern tln_sm_t tln2000sm;
 
 enum {
     TLN_STATE_OFF = TLN_USER_STATES_START,
+    TLN_STATE_SELF_TEST_START,
     TLN_STATE_SELF_TEST,
     TLN_STATE_FUEL_ON_BOARD_PROMPT,
     TLN_STATE_FUEL_ON_BOARD_EDIT,
@@ -23,6 +24,7 @@ enum {
 
     // WPT
     TLN_STATE_WPT,
+    TLN_STATE_WPT_SELECT,
     TLN_STATE_WPT_CATEGORY,
     TLN_STATE_WPT_AIRPORT,
     TLN_STATE_WPT_VOR,
@@ -59,6 +61,11 @@ enum {
 
     // Self test event
     TLN_EVENT_TEST_PASS,
+    TLN_EVENT_LCD_ON,
+
+    // SD Card
+    TLN_EVENT_SDCARD_REMOVE,
+    TLN_EVENT_SDCARD_INSERT,
 
     // Mode key-press events
     TLN_EVENT_BTN_POWER,

@@ -36,8 +36,8 @@ struct tln_sm_data g_tln2000_data = {
 
 void selfTestStart(tln_sm_data_t *data) {
     data->selfTestState = 0;
-    enableAllAnnunciators();
     displaySet("", "");
+    enableAllAnnunciators();
 }
 
 void selfTest(tln_sm_data_t *data) {
@@ -53,6 +53,7 @@ void selfTest(tln_sm_data_t *data) {
     switch (data->selfTestState++) {
         case 5:
             displaySet("SOFTWARE CODE: 20000", "c1991       ");
+            state_update(tln2000sm, TLN_EVENT_LCD_ON);
             break;
         case 10:
             disableAllAnnunciators();
@@ -181,16 +182,18 @@ void updateSystems(tln_sm_data_t *data) {
 tln_sm_transition_t states[] = {
 
     // Power on
-    {TLN_STATE_OFF, TLN_EVENT_BTN_POWER, TLN_STATE_SELF_TEST, &selfTestStart},
+    {TLN_STATE_OFF, TLN_EVENT_BTN_POWER, TLN_STATE_SELF_TEST_START, &selfTestStart},
     {TLN_STATE_OFF, TLN_EVENT_ANY, TLN_STATE_OFF, 0},
 
     // From any state, power off
     {TLN_STATE_ANY, TLN_EVENT_BTN_POWER, TLN_STATE_OFF, &powerOff},
 
+    {TLN_STATE_SELF_TEST_START, TLN_EVENT_UPDATE, TLN_STATE_SELF_TEST_START, &selfTest},
+    {TLN_STATE_SELF_TEST_START, TLN_EVENT_LCD_ON, TLN_STATE_SELF_TEST, 0},
+    {TLN_STATE_SELF_TEST_START, TLN_EVENT_ANY, TLN_STATE_SELF_TEST_START, 0},
+
     {TLN_STATE_SELF_TEST, TLN_EVENT_UPDATE, TLN_STATE_SELF_TEST, &selfTest},
-    {TLN_STATE_SELF_TEST, TLN_EVENT_BTN_NAV, TLN_STATE_NAV, &nav_updateDisplay},
     {TLN_STATE_SELF_TEST, TLN_EVENT_TEST_PASS, TLN_STATE_FUEL_ON_BOARD_PROMPT, &fuelOnBoard},
-    {TLN_STATE_SELF_TEST, TLN_EVENT_ANY, TLN_STATE_SELF_TEST, 0},
 
     // NAV
     {TLN_STATE_NAV, TLN_EVENT_UPDATE, TLN_STATE_NAV, &nav_updateDisplay},
@@ -213,22 +216,22 @@ tln_sm_transition_t states[] = {
     {TLN_STATE_WPT, TLN_EVENT_UPDATE, TLN_STATE_WPT, &wpt_displayWaypoint},
     {TLN_STATE_WPT, TLN_EVENT_BTN_ROT_OUT_CC, TLN_STATE_WPT, &wpt_pagePrev},
     {TLN_STATE_WPT, TLN_EVENT_BTN_ROT_OUT_CW, TLN_STATE_WPT, &wpt_pageNext},
+    {TLN_STATE_WPT, TLN_EVENT_BTN_ROT_IN_CC, TLN_STATE_WPT, &wpt_waypointPrev},
+    {TLN_STATE_WPT, TLN_EVENT_BTN_ROT_IN_CW, TLN_STATE_WPT, &wpt_waypointNext},
+    {TLN_STATE_WPT, TLN_EVENT_BTN_ENT, TLN_STATE_WPT_SELECT, &wpt_select},
     {TLN_STATE_WPT, TLN_EVENT_BTN_WPT, TLN_STATE_WPT_CATEGORY, &wpt_displayCategory},
     {TLN_STATE_WPT, TLN_EVENT_BTN_WPT_HOLD, TLN_STATE_WPT, &wpt_categoryReset},
+
+    {TLN_STATE_WPT_SELECT, TLN_EVENT_UPDATE, TLN_STATE_WPT_SELECT, &wpt_select},
+    {TLN_STATE_WPT_SELECT, TLN_EVENT_BTN_ROT_OUT_CC, TLN_STATE_WPT_SELECT, &wpt_selectPrevField},
+    {TLN_STATE_WPT_SELECT, TLN_EVENT_BTN_ROT_OUT_CW, TLN_STATE_WPT_SELECT, &wpt_selectNextField},
+    {TLN_STATE_WPT_SELECT, TLN_EVENT_BTN_ROT_IN_CC, TLN_STATE_WPT_SELECT, &wpt_selectPrevLetter},
+    {TLN_STATE_WPT_SELECT, TLN_EVENT_BTN_ROT_IN_CW, TLN_STATE_WPT_SELECT, &wpt_selectNextLetter},
+    {TLN_STATE_WPT_SELECT, TLN_EVENT_BTN_ENT, TLN_STATE_WPT, &wpt_selectEnter},
 
     {TLN_STATE_WPT_CATEGORY, TLN_EVENT_BTN_WPT, TLN_STATE_WPT_CATEGORY, &wpt_categoryNext},
     {TLN_STATE_WPT_CATEGORY, TLN_EVENT_TIMEOUT, TLN_STATE_WPT, &wpt_displayCategory},
     {TLN_STATE_WPT_CATEGORY, TLN_EVENT_BTN_WPT_HOLD, TLN_STATE_WPT, &wpt_categoryReset},
-
-    // {TLN_STATE_WPT_AIRPORT, TLN_EVENT_UPDATE, TLN_STATE_WPT_AIRPORT, &wpt_airport_display},
-    // {TLN_STATE_WPT_VOR, TLN_EVENT_UPDATE, TLN_STATE_WPT_VOR, &wpt_vor_display},
-    // {TLN_STATE_WPT_VOR, TLN_EVENT_BTN_WPT_HOLD, TLN_STATE_WPT_AIRPORT, &wpt_airport_display},
-    // {TLN_STATE_WPT_NDB, TLN_EVENT_UPDATE, TLN_STATE_WPT_NDB, &wpt_ndb_display},
-    // {TLN_STATE_WPT_NDB, TLN_EVENT_BTN_WPT_HOLD, TLN_STATE_WPT_AIRPORT, &wpt_airport_display},
-    // {TLN_STATE_WPT_INT, TLN_EVENT_UPDATE, TLN_STATE_WPT_INT, &wpt_int_display},
-    // {TLN_STATE_WPT_INT, TLN_EVENT_BTN_WPT_HOLD, TLN_STATE_WPT_AIRPORT, &wpt_airport_display},
-    // {TLN_STATE_WPT_USER, TLN_EVENT_UPDATE, TLN_STATE_WPT_USER, &wpt_user_display},
-    // {TLN_STATE_WPT_USER, TLN_EVENT_BTN_WPT_HOLD, TLN_STATE_WPT_AIRPORT, &wpt_airport_display},
 
     // CALC
     {TLN_STATE_CALC, TLN_EVENT_BTN_ROT_IN_CW, TLN_STATE_CALC, &calcNext},

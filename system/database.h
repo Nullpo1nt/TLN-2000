@@ -3,6 +3,8 @@
 
 #include "tln_structs.h"
 
+typedef struct _tln_db_s *tln_db_t;
+void test();
 tln_wp_t *database_getAirport(int x);
 //     const greatcircle::LLPoint newportRI = {41.49008 * 0.017453293, -71.312796 * 0.017453293};
 //     const greatcircle::LLPoint clevelandOH = {41.499498 * 0.017453293, -81.695391 * 0.017453293};
