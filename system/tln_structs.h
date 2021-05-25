@@ -13,10 +13,22 @@ typedef struct tln_waypoints {
 
     char icao[6];
     char usId[6];
-    char name[32];
+    char *name;
     char city[32];
     char state[3];
 } tln_wp_t;
+
+struct tln_airports {
+    char ats[8];
+    char app[8];
+    char twr[8];
+    char gnd[8];
+    char ctf[8];
+    char uni[8];
+    int elevation;
+    // services
+    char *runways[];
+};
 
 typedef struct tln_flightplans {
     tln_wp_t waypoints[20];

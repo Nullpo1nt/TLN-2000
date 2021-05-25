@@ -26,7 +26,7 @@ void state_update(tln_sm_t sm, tln_sm_event_t event) {
             if (event == entry->event || TLN_EVENT_ANY == entry->event) {
                 if (entry->nextState != TLN_STATE_ANY) sm->state = entry->nextState;
                 if (entry->stateFunction != 0) entry->stateFunction(sm->data);
-                if (entry->bubble == CONSUME_EVENT) return;
+                if (entry->bubble == TLN_SM_CONSUME_EVENT) return;
             }
         }
     }

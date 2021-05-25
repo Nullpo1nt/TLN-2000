@@ -1,3 +1,6 @@
 reference/
 SDK/
 build/
+
+# OSX
+.DS_Store
